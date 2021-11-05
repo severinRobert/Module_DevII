@@ -28,9 +28,9 @@ def get_weather(location):
     try:
         r = requests.get(f'http://api.openweathermap.org/data/2.5/weather?q={location}&APPID={APIKEY}&lang={LANG}')
         data = r.json()
-        if data["cod"] == 404:
+        if str(data["cod"]) == '404':
             print("La ville indiquée n'a pas été trouvée.")
-        elif data["cod"] == 200:
+        elif str(data["cod"]) == '200':
             print(f'Localisation : {location}')
             print(f'Météo : {data["weather"][0]["description"]}')
             print(f'Température : {round(data["main"]["temp"] - 273.15, 2)}°C')
