@@ -1,33 +1,52 @@
-import python_weather
+import requests
+
 
 def loop():
-    running=True
-    while running:
+    while True:
         command = input("Entrez votre commande : ")
         manage_command(command)
 
+
 def manage_command(command):
     command = command.split()
-    if command[0] == "weather":
-        getweather(command[1])
+    command = clean_command(command)
+    if command[0] == "meteo":
+        get_weather(command[1])
+    elif command[0] == "exit":
+        exit()
 
 
-def getweather(location):
-    # declare the client. format defaults to metric system (celcius, km/h, etc.)
-    client = python_weather.Client(format=python_weather.IMPERIAL)
+def clean_command(command):
+    new_command = []
+    for i in command:
+        if i != "":
+            new_command.append(i)
+    return new_command
 
-    # fetch a weather forecast from a city
-    weather = await client.find(location)
 
-    # returns the current day's forecast temperature (int)
-    print(weather.current.temperature)
+def get_weather(location):
+    try:
+        r = requests.get(f'http://api.openweathermap.org/data/2.5/weather?q={location}&APPID={APIKEY}&lang={LANG}')
+        data = r.json()
+        if data["cod"] == 404:
+            print("La ville indiquée n'a pas été trouvée.")
+        elif data["cod"] == 200:
+            print(f'Localisation : {location}')
+            print(f'Météo : {data["weather"][0]["description"]}')
+            print(f'Température : {round(data["main"]["temp"] - 273.15, 2)}°C')
+            print(f'Humidité : {data["main"]["humidity"]}%')
 
-    # get the weather forecast for a few days
-    for forecast in weather.forecasts:
-        print(str(forecast.date), forecast.sky_text, forecast.temperature)
+    except requests.exceptions.HTTPError as errh:
+        print("Http Error:", errh)
+    except requests.exceptions.ConnectionError as errc:
+        print("Error Connecting:", errc)
+    except requests.exceptions.Timeout as errt:
+        print("Timeout Error:", errt)
+    except requests.exceptions.RequestException as err:
+        print("OOps: Something Else", err)
 
-    # close the wrapper once done
-    await client.close()
 
 if __name__ == "__main__":
+    APIKEY = "ba71f5ff6d30856ebd20ab63054e9e1b"
+    LANG = "fr"
     loop()
