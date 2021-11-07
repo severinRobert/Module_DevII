@@ -18,6 +18,5 @@ def loop():
         command = Command(command.split())
         manage_command(command)
 
-
 if __name__ == "__main__":
     loop()
