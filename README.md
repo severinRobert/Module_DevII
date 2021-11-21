@@ -16,3 +16,12 @@ Les branches permettent de travailler en parallèle du projet sur une autre fonc
 - git branch [nomBranche] : Crée une nouvelle branche.
 - git checkout [nomBranche] : Permet de changer de branche.
 - git merge [nomBranche] : Merge [nomBranche] sur la branche dans laquelle on se trouve.
+
+## Création venv
+`python3 -m venv ./venv`<br>
+Pour Mac/Linux : `source myvenv/bin/activate`<br>
+Pour Windows : `env\Scripts\activate.bat`
+
+## requirements.txt
+Mettre à jour les librairies utilisées : `pip freeze > requirements.txt`<br>
+Installe en local les librairies du projet : `pip install -r requirements.txt`
