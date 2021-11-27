@@ -1,25 +1,33 @@
-
 from lib.weather import get_weather
 from lib.dictionary import get_definition
 from lib.command import Command
+import cmd
 
-def manage_command(command:Command):
-        if command.name.lower() == "meteo":
-            get_weather(command.arguments)
-        elif command.name.lower() == "definition":
-            get_definition(command.arguments)
-        elif command.name.lower() == "hello":
-            print("Hello !")
-        elif command.name == "exit":
-            exit()
 
+
+
+class Chatbot(cmd.Cmd):
+
+    prompt = '(chatbot) '
+    history = []
+
+    def do_meteo(self, line):
+        get_weather(line.split())
+    
+    def do_definition(self, line):
+        get_definition(line.split())
+
+    def do_exit(self,line):
+        return True
 
 def loop():
     while True:
-        command = input("Entrez votre commande : ")
-        command = Command(command.split())
-        manage_command(command)
+        e = input('>>>')
+        if "/bot" in e:
+            Chatbot().cmdloop()
+
 
 
 if __name__ == "__main__":
     loop()
+
