@@ -1,6 +1,5 @@
-from lib.weather import get_weather
+from lib.weather import Weather
 from lib.dictionary import get_definition
-from lib.command import Command
 import cmd
 
 
@@ -12,7 +11,7 @@ class Chatbot(cmd.Cmd):
     history = []
 
     def do_meteo(self, line):
-        get_weather(line.split())
+        weather = Weather()
     
     def do_definition(self, line):
         get_definition(line.split())
@@ -29,5 +28,6 @@ def loop():
 
 
 if __name__ == "__main__":
-    loop()
+    Chatbot().cmdloop()
+    #loop()
 

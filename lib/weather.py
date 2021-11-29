@@ -6,17 +6,77 @@ import math
 WEATHER_APIKEY = "ba71f5ff6d30856ebd20ab63054e9e1b"
 LANG = "fr"
 
+class Weather:
+    def __init__(self, location, hour=None, day=None, weather=None) -> None:
+        self.__location = location
+        self.__hour = hour
+        self.__day = day
+        self.__weather = weather
+    
+    def get_weather(self) -> None:
+        """Cherche les données météo à l'heure demandée
+        """
+        request = f'https://api.openweathermap.org/data/2.5/weather?q={self.__location}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric'
+
+        try:
+            self.__weather = requests.get(request).json()
+            if str(self.__weather["cod"]) == '404':
+                print("La ville indiquée n'a pas été trouvée.")
+            elif str(self.__weather["cod"]) == '200':
+                # si l'utilisateur indique une heure/jour
+                if self.__hour != None:
+                    latitude = self.__weather['coord']['lat']
+                    longitude = self.__weather['coord']['lon']
+                    
+                    self.__weather = get_weather_hourly(latitude, longitude)
+                    print(datetime.datetime.fromtimestamp(self.__weather['dt']))
+                    print(self.__weather)
+
+                # si rien est indiqué après la ville on prend la météo actuelle
+                else:
+                    print(f'Localisation : {self.__location}')
+                    print(f'Météo : {self.__weather["weather"][0]["description"]}')
+                    print(f'Température : {self.__weather["main"]["temp"]}°C')
+                    print(f'Humidité : {self.__weather["main"]["humidity"]}%')
+
+        except requests.exceptions.HTTPError as errh:
+            print("Http Error:", errh)
+        except requests.exceptions.ConnectionError as errc:
+            print("Error Connecting:", errc)
+        except requests.exceptions.Timeout as errt:
+            print("Timeout Error:", errt)
+        except requests.exceptions.RequestException as err:
+            print("OOps: Something Else", err)
+
+        def __get_weather_hourly(lat: str, lon: str):
+            """Cherche les données météo à l'heure demandée
+
+            Args:
+                lat (str): latitude du lieu
+                lon (str): longitude du lieu
+
+            Returns:
+                json: donnée météo
+            """
+            exclude = 'current,minutely,daily'
+            data = requests.get(f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric').json()
+            
+            # temps actuel en secondes
+            current_time = int(time.time()) 
+            # avoir l'heure actuelles
+            current_hour = datetime.datetime.fromtimestamp(current_time).hour
+            # supprimer les min et sec + ajouter les heures pour arriver à l'heure demandée
+            hours_to_add = self.__hour - current_hour if self.__hour > current_hour else 24 - current_hour + self.__hour
+            weather_time = current_time - current_time%3600 + hours_to_add*3600 
+            # Chercher l'heure demandée
+            for i in data['hourly']:
+                if int(i['dt']) == weather_time:
+                    return i
+            print("Erreur")
+
+
+"""
 def get_weather_hourly(hour_asked: int, lat: str, lon: str):
-    """Cherche les données météo à l'heure demandée
-
-    Args:
-        hour_asked (int): heure de la météo à chercher
-        lat (str): latitude du lieu
-        lon (str): longitude du lieu
-
-    Returns:
-        json: donnée météo
-    """
     exclude = 'current,minutely,daily'
     data = requests.get(f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric').json()
     
@@ -35,11 +95,6 @@ def get_weather_hourly(hour_asked: int, lat: str, lon: str):
 
 
 def get_weather(arguments: list):
-    """Gère l'accès aux données météo
-
-    Args:
-        arguments (list): arguments donné par l'utilisateur (lieu, heure/jour)
-    """
     location = arguments[0]
     request = f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric'
 
@@ -75,3 +130,5 @@ def get_weather(arguments: list):
         print("Timeout Error:", errt)
     except requests.exceptions.RequestException as err:
         print("OOps: Something Else", err)
+
+"""
