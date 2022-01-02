@@ -1,15 +1,22 @@
 from lib.weather import Weather
 from lib.dictionary import Dictionary
 import cmd
+import datetime
+
+class Command():
+    def __init__(self, user:int, date:datetime, result:dict) -> None:
+        self.user = user
+        self.date = date
+        self.result = result
+
+    def __send_command_to_history():
+        print("historique pas encore implémenté")
 
 
-
-
-class Chatbot(cmd.Cmd):
+class Shell(cmd.Cmd):
 
     prompt = '(chatbot) '
     
-
     def do_meteo(self, line):
         line = line.split()
         location = line[0]
@@ -25,6 +32,7 @@ class Chatbot(cmd.Cmd):
     def do_exit(self, line):
         return True
 
+
 def loop():
     while True:
         e = input('>>>')
@@ -34,6 +42,6 @@ def loop():
 
 
 if __name__ == "__main__":
-    Chatbot().cmdloop()
+    Shell().cmdloop()
     #loop()
 

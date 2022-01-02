@@ -42,8 +42,7 @@ class Weather:
                 # si rien est indiqué après la ville on prend la météo actuelle
                 else:
                     print(f'Localisation : {self.__location}')
-                    print(
-                        f'Météo : {self.__weather["weather"][0]["description"]}')
+                    print(f'Météo : {self.__weather["weather"][0]["description"]}')
                     print(f'Température : {self.__weather["main"]["temp"]}°C')
                     print(f'Humidité : {self.__weather["main"]["humidity"]}%')
 
@@ -67,8 +66,7 @@ class Weather:
             json: donnée météo
         """
         exclude = 'current,minutely,daily'
-        data = requests.get(
-            f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric').json()
+        data = requests.get(f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={exclude}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric').json()
 
         # temps actuel en secondes
         current_time = int(time.time())
