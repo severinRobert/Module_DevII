@@ -1,19 +1,10 @@
+import datetime
 
+class Command():
+    def __init__(self, user:int, date:datetime, result:dict) -> None:
+        self.user = user
+        self.date = date
+        self.result = result
 
-class Command:
-    def __init__(self, command: list) -> None:
-        self.command = self.clean_command(command)
-        self.name = self.command[0]
-        self.arguments = self.command[1:]
-        
-    
-    def clean_command(self, command: list):
-        new_command = []
-        for i in command:
-            if i != "":
-                new_command.append(i)
-        return new_command
-    
-    
-
-    
+    def __send_command_to_history():
+        print("historique pas encore implémenté")

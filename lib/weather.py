@@ -3,12 +3,13 @@ import requests
 import datetime
 import time
 import math
+from command import Command
 
 WEATHER_APIKEY = "ba71f5ff6d30856ebd20ab63054e9e1b"
 LANG = "fr"
 
 
-class Weather:
+class Weather(Command):
     def __init__(self, location: str, hour: int = None, day: str = None, weather: json = None) -> None:
         self.__location = location
         self.__hour = hour
