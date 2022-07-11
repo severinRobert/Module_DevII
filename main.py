@@ -9,19 +9,21 @@ class Shell(cmd.Cmd):
     prompt = '(chatbot) '
     
     def do_meteo(self, args):
+        'Recherche la météo d\'une ville : "meteo <ville> [<heure/jour>]"'
         args = args.split()
-        location = args[0]
-        hour = None if len(args) != 2 or args[1][-1].upper() != 'H' else int(args[1][:-1])
-        day = None if len(args) != 2 else args[1]
-        weather = Weather(1, location, hour, day)
+        location = None if len(args) < 1 else args[0]
+        when = None if len(args) < 2 else args[1]
+        weather = Weather(1, location, when)
         weather.get_weather()
         print(weather)
 
     def do_definition(self, word):
+        'Recherche la définition d\'un mot : "definition <mot>"'
         definitions = Dictionary(1, word)
         print(definitions)
 
     def do_exit(self, line):
+        'Quitte le programme'
         return True
 
 

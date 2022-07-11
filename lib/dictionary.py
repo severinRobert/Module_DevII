@@ -11,13 +11,16 @@ class Dictionary(Command):
     def __init__(self, user: int, word: str) -> None:
         super().__init__(user)
         self.word = word
-        self.__definitions = self.get_definitions(word)
+        self.definitions = self.get_definitions(word)
 
     def get_definitions(self, word):
         """
         :param word: The word whose definition you are looking for
         :return: A list containing all the definitions of word
         """
+        if word == "":
+            return ['Veuillez indiquer le mot à définir : "definition <mot>"']
+
         url = "https://www.larousse.fr/dictionnaires/francais/" + word.lower()
         soup = BeautifulSoup(requests.get(url=url).text, 'html.parser')
         for ul in soup.find_all('ul'):
@@ -30,7 +33,7 @@ class Dictionary(Command):
 
     def __str__(self) -> str:
         str_to_print = ""
-        for definition in self.__definitions:
+        for definition in self.definitions:
             str_to_print += f'{definition}\n'
-        str_to_print += "Source : Larousse\n"
+        str_to_print += "\nSource : Larousse\n"
         return str_to_print
