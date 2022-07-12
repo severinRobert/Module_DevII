@@ -44,5 +44,23 @@ class WeatherTestCase(unittest.TestCase):
         self.assertTrue(re.search("Météo à Bruxelles, BE - aujourd'hui", Weather(1, "Bruxelles", " ").__str__()) is not None)
         self.assertTrue(re.search("Météo à Bruxelles, BE - ", Weather(1, "Bruxelles", "7H").__str__()) is not None)
 
+    def test_jour_non_valide(self):
+        """Vérification que si on demande la météo d'une ville avec un jour non valide, on obtient une erreur"""
+        self.assertEqual(Weather(1, "Bruxelles", "jour").error, "Veuillez indiquer un jour valide ('jour' n'est pas valide).")
+        self.assertEqual(Weather(1, "Amsterdam", "une").error, "Veuillez indiquer un jour valide ('une' n'est pas valide).")
+        self.assertEqual(Weather(1, "Limal", "demain").error, "Veuillez indiquer un jour valide ('demain' n'est pas valide).")
+        self.assertEqual(Weather(1, "Genappes", "jeuddi").error, "Veuillez indiquer un jour valide ('jeuddi' n'est pas valide).")
+
+    def test_jour_valide(self):
+        """Vérification que si on demande la météo d'une ville avec un jour valide, on obtient sa meteo à cette heure"""
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le lundi", Weather(1, "Bruxelles", "lundi").__str__()) is not None)
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le mardi", Weather(1, "Bruxelles", "mardi").__str__()) is not None)
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le mercredi", Weather(1, "Bruxelles", "mercredi").__str__()) is not None)
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le jeudi", Weather(1, "Bruxelles", "jeudi").__str__()) is not None)
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le vendredi", Weather(1, "Bruxelles", "vendredi").__str__()) is not None)
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le samedi", Weather(1, "Bruxelles", "samedi").__str__()) is not None)
+        self.assertTrue(re.search("Météo à Bruxelles, BE - le dimanche", Weather(1, "Bruxelles", "dimanche").__str__()) is not None)
+
+
 if __name__ == '__main__':
     unittest.main()
