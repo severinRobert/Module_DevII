@@ -17,17 +17,31 @@ class DictionaryTestCase(unittest.TestCase):
         self.assertEqual(Dictionary(1, "").definitions[0],"Veuillez indiquer le mot à définir : \"definition <mot>\"")
         
 class WeatherTestCase(unittest.TestCase):
-    def test_ville_existante(self):
-        """Vérification que si on demande la météo d'une ville existante, on obtient une liste de météo"""
-        self.assertTrue()
+    def test_ville_vide(self):
+        """Vérification que si on demande la météo sans indiquer une ville, on obtient une erreur qui demande une ville"""
+        self.assertEqual(Weather(1).error, "Veuillez indiquer une ville.")
+        self.assertEqual(Weather(1, None).error, "Veuillez indiquer une ville.")
+        self.assertEqual(Weather(1, "").error, "Veuillez indiquer une ville.")
         
     def test_ville_inexistante(self):
-        """Vérification que si on demande la météo d'une ville inexistante, on obtient une liste de météo"""
-        self.assertEqual(Weather(1, "jukai").weather[0],"La météo de jukai n'a pas été trouvée")
+        """Vérification que si on demande la météo d'une ville inexistante, on obtient une erreur qui indique que la ville n'existe pas"""
+        self.assertEqual(Weather(1, "jukai").error,"La ville indiquée n'a pas été trouvée.")
     
-    def test_ville_vide(self):
-        """Vérification que si on demande la météo d'une ville vide, on obtient un message d'erreur"""
-        self.assertEqual(Weather(1, "").weather[0],"Veuillez indiquer la")
+    def test_ville_existante(self):
+        """Vérification que si on demande la météo d'une ville, on obtient sa meteo actuelle"""
+        self.assertTrue(re.match("Météo à Bruxelles, BE - aujourd'hui", Weather(1, "Bruxelles").__str__()) is not None)
+        self.assertTrue(re.match("Météo à Ottignies, BE - aujourd'hui", Weather(1, "Ottignies").__str__()) is not None)
+        self.assertTrue(re.match("Météo à Washington, US - aujourd'hui", Weather(1, "Washington").__str__()) is not None)
+
+    def test_heure_non_valide(self):
+        """Vérification que si on demande la météo d'une ville avec une heure non valide, on obtient une erreur"""
+        self.assertEqual(Weather(1, "Bruxelles", "24h").error, "Veuillez indiquer un jour valide ('24h' n'est pas valide).")
+        self.assertEqual(Weather(1, "Bruxelles", "145h").error, "Veuillez indiquer un jour valide ('145h' n'est pas valide).")
+
+    def test_heure_valide(self):
+        """Vérification que si on demande la météo d'une ville avec une heure valide, on obtient sa meteo à cette heure"""
+        self.assertTrue(re.match("Météo à Bruxelles, BE - ", Weather(1, "Bruxelles", "23h").__str__()) is not None)
+        self.assertTrue(re.match("Météo à Bruxelles, BE - aujourd'hui", Weather(1, "Bruxelles", " ").__str__()) is not None)
 
 if __name__ == '__main__':
     unittest.main()

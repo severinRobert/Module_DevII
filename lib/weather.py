@@ -16,31 +16,36 @@ LANG = "fr"
 class Weather(Command):
     days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
 
-    def __init__(self, user: int, location: str, when: int = None, weather: json = None) -> None:
+    def __init__(self, user: int, location: str = None, when: int = None, weather: json = None) -> None:
         super().__init__(user)
         self.__location = location
-        self.__hour = when
-        self.__day = when
+        self.__when = when
+        self.__hour = None
+        self.__day = None
         self.weather = weather
-        self.__error = ""
+        self.error = ""
+        self.get_weather()
 
     def __check_params(self):
         """ Vérifie les paramètre donné à la classe """
         if self.__location is None or self.__location == '':
-            self.__error = "Veuillez indiquer une ville."
+            self.error = "Veuillez indiquer une ville."
             return 1
-        if self.__hour is not None and self.__hour[-1] == 'h' or ( self.__hour[:-1].isdecimal() and int(self.__hour[:-1]) in range(0, 24) ):
-            self.__error = f"Veuillez indiquer une heure qui soit valide ('{self.__hour}' n'est pas valide)."
+        if self.__when is not None and self.__when[-1] == 'h' and not self.__when[:-1].isdecimal() and int(self.__when[:-1]) in range(0, 24):
+            self.error = f"Veuillez indiquer une heure qui soit valide ('{self.__when}' n'est pas valide)."
             return 1
-        elif self.__day is not None and self.__day not in self.days:
-            self.__error = f"Veuillez indiquer un jour valide ('{self.__day}' n'est pas valide)."
+        elif self.__when is not None and self.__when[-1] == 'h' and self.__when[:-1].isdecimal():
+            self.__hour = int(self.__when[:-1])
+        elif self.__when is not None and self.__when not in self.days:
+            self.error = f"Veuillez indiquer un jour valide ('{self.__when}' n'est pas valide)."
             return 1
+        elif self.__when is not None and self.__when in self.days:
+            self.__day = self.days.index(self.__when)
         return 0
 
     
     def get_weather(self) -> None:
-        """Cherche les données météo à l'heure demandée
-        """
+        """Cherche les données météo à l'heure demandée"""
         if self.__check_params() == 1:
             return
         request = f'https://api.openweathermap.org/data/2.5/weather?q={self.__location}&appid={WEATHER_APIKEY}&lang={LANG}&units=metric'
@@ -48,7 +53,7 @@ class Weather(Command):
         try:
             self.weather = {'cod': '404'} if self.__location=='' or self.__location is None else requests.get(request).json()
             if str(self.weather["cod"]) == '404':
-                self.__error = "La ville indiquée n'a pas été trouvée."
+                self.error = "La ville indiquée n'a pas été trouvée."
             elif str(self.weather["cod"]) == '200':
                 latitude = self.weather['coord']['lat']
                 longitude = self.weather['coord']['lon']
@@ -100,7 +105,7 @@ class Weather(Command):
         for i in data['hourly']:
             if int(i['dt']) == weather_time:
                 return i
-        print("Erreur, heure non trouvée")
+        self.error = "Erreur, heure non trouvée"
 
     def __get_weather_daily(self, lat: str, lon: str):
         """Cherche les données météo au jour demandé
@@ -120,15 +125,18 @@ class Weather(Command):
         # avoir le jour actuel
         current_day = datetime.datetime.fromtimestamp(current_time).weekday()
         # avoir le nombre de jour à ajouter pour arriver au jour demandé
-        days_to_add = (self.days.index(self.__day) - current_day) % 7
+        days_to_add = (self.__day - current_day) % 7
         self.weather = data['daily'][days_to_add]
         return self.weather
 
     def __str__(self) -> str:
-        if self.__error == "":
+        if self.error == "":
             date = datetime.datetime.fromtimestamp(self.weather["dt"])
             day = self.days[date.weekday()]
-            day = " aujourd'hui" if self.__day is None else f" le {day}"
+            if self.__day is None:
+                day = " aujourd'hui" if self.__hour is not None and self.__hour > datetime.datetime.now().hour else f" demain"
+            else:
+                day = f" le {day}"
             hour = "" if self.__hour is None else f" à {self.__hour}h"
             date = " " + date.strftime("%d/%m/%Y")
             description = self.weather["weather"][0]["description"]
@@ -140,5 +148,5 @@ class Weather(Command):
             str_to_print += f"{description}, {temperature} avec un ressenti de {feels_like}\n"
             str_to_print += f"{humidity}% d'humidité\n"
         else:
-            str_to_print = self.__error
+            str_to_print = self.error
         return str_to_print

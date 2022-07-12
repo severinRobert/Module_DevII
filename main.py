@@ -14,7 +14,6 @@ class Shell(cmd.Cmd):
         location = None if len(args) < 1 else args[0]
         when = None if len(args) < 2 else args[1]
         weather = Weather(1, location, when)
-        weather.get_weather()
         print(weather)
 
     def do_definition(self, word):
