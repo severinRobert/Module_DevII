@@ -31,10 +31,12 @@ class Weather(Command):
         if self.__location is None or self.__location == '':
             self.error = "Veuillez indiquer une ville."
             return 1
-        if self.__when is not None and self.__when[-1] == 'h' and not self.__when[:-1].isdecimal() and int(self.__when[:-1]) in range(0, 24):
-            self.error = f"Veuillez indiquer une heure qui soit valide ('{self.__when}' n'est pas valide)."
+        if self.__when == " ":
+            return 0
+        if self.__when is not None and self.__when[-1].upper() == 'H' and self.__when[:-1].isdecimal() and int(self.__when[:-1]) not in range(0, 24):
+            self.error = f"Veuillez indiquer une heure valide ('{self.__when}' n'est pas valide)."
             return 1
-        elif self.__when is not None and self.__when[-1] == 'h' and self.__when[:-1].isdecimal():
+        elif self.__when is not None and self.__when[-1].upper() == 'H' and self.__when[:-1].isdecimal():
             self.__hour = int(self.__when[:-1])
         elif self.__when is not None and self.__when not in self.days:
             self.error = f"Veuillez indiquer un jour valide ('{self.__when}' n'est pas valide)."
@@ -134,7 +136,7 @@ class Weather(Command):
             date = datetime.datetime.fromtimestamp(self.weather["dt"])
             day = self.days[date.weekday()]
             if self.__day is None:
-                day = " aujourd'hui" if self.__hour is not None and self.__hour > datetime.datetime.now().hour else f" demain"
+                day = " aujourd'hui" if self.__hour is None or (self.__hour is not None and self.__hour > datetime.datetime.now().hour) else f" demain"
             else:
                 day = f" le {day}"
             hour = "" if self.__hour is None else f" à {self.__hour}h"
